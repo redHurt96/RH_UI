@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 
 namespace RH_Modules.UI.Core
@@ -7,12 +6,20 @@ namespace RH_Modules.UI.Core
     {
         public abstract string Id { get; }
         
+        private IBinding _target;
+        
         public void Setup(IBinding target)
         {
-            Binding<T> genericTarget = target as Binding<T>;
+            _target = target;
+            _target.Updated += SetValue;
+            
+            SetValue();
+        }
 
-            if (genericTarget == null)
-                throw new Exception($"Type of binding with id {Id} doesn't match with binding element type");
+        private void SetValue()
+        {
+            if (_target is not Binding<T> genericTarget)
+                throw new($"Type of binding with id {Id} doesn't match with binding element type");
             
             SetValue(genericTarget.Value);
         }
